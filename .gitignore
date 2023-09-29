@@ -1,0 +1,10 @@
+.idea
+data
+experiments
+*__pycache__
+.vscode
+*.png
+*.pdf
+*.jpeg
+*.snakemake*
+
