@@ -1,11 +1,11 @@
 .idea
 data/*
 experiments/*
-*__pycache__
+**/__pycache__
 .vscode
 *.png
 *.pdf
 *.jpeg
 *.snakemake*
 
-!experiments/Snakefile
+!Snakefile

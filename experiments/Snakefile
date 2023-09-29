@@ -1,3 +1,5 @@
+# General Snakefile for simulating kimura adaptive walks
+
 configfile: "./config.yaml"
 scripts = config["scripts"]
 csv_input = config["csv_input"]
