@@ -1,6 +1,6 @@
 .idea
-data
-experiments
+data/*
+experiments/*
 *__pycache__
 .vscode
 *.png
@@ -8,3 +8,4 @@ experiments
 *.jpeg
 *.snakemake*
 
+!experiments/Snakefile
