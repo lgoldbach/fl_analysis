@@ -9,3 +9,4 @@ experiments/*
 *.snakemake*
 
 !Snakefile
+!config.yaml

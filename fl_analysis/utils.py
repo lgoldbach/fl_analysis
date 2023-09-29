@@ -11,8 +11,8 @@ def read_fl_data(path):
     Returns:
         (np.array, np.array): array of genotypes, array of phenotypes 
     """
-    fl_df = pd.read_csv(path, delimiter="\t")
-
+    fl_df = pd.read_csv(path, delimiter=",")
+    print(fl_df)
     # turn into N x L array (N = #sequences, L = sequence length)
     seq_arr = np.array([list(seq) for seq in fl_df["seq"]])
     # remove columns that contain the same base, i.e. redundant sites of seq.
