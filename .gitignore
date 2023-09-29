@@ -1,10 +1,12 @@
 .idea
-data
-experiments
-*__pycache__
+data/*
+experiments/*
+**/__pycache__
 .vscode
 *.png
 *.pdf
 *.jpeg
 *.snakemake*
 
+!Snakefile
+!config.yaml

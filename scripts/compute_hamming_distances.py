@@ -15,7 +15,6 @@ hamming_dist = np.empty((num_of_seq, num_of_seq))
 # compute pairwise hamming distances
 for i in range(num_of_seq):
     for j in range(i):
-        
         hamming_dist[i, j] = hamming(seq_arr_num[i], seq_arr_num[j]) 
 
 # multiply by sequence length to get hamming distance not as fraction

@@ -6,11 +6,10 @@ from fl_analysis.utils import kimura_fixation
 
 
 # Snakemake input output definitions
-input_phenotypes = snakemake.input.hamming_dist
-input_hamming_distances = snakemake.input.phenotypes
+input_phenotypes = snakemake.input.phenotypes
+input_hamming_distances = snakemake.input.hamming_dist
 output = snakemake.output[0]
 population_size = 10 ** int(snakemake.params.pop_size_exp)
-print(population_size)
 
 hamming_dist = np.load(input_hamming_distances)
 ph = np.load(input_phenotypes)
