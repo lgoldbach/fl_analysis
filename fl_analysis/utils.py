@@ -2,22 +2,21 @@ import numpy as np
 import pandas as pd
 
 
-def read_fl_data(path):
+def read_fl_data(path: str, delim: str):
     """Read the data from the fitness landscape data file
 
     Args:
         path (str): Path to the fitness landscape data file
-    
+        delim (str): csv delimiter, e.g. "," or "\t"
+        
     Returns:
         (np.array, np.array): array of genotypes, array of phenotypes 
     """
-    fl_df = pd.read_csv(path, delimiter=",")
-    print(fl_df)
+    fl_df = pd.read_csv(path, delimiter=delim)
     # turn into N x L array (N = #sequences, L = sequence length)
     seq_arr = np.array([list(seq) for seq in fl_df["seq"]])
     # remove columns that contain the same base, i.e. redundant sites of seq.
     seq_arr = remove_redundant(seq_arr)
-
     phe_arr = fl_df["score"].to_numpy(dtype=float)
 
     return seq_arr, phe_arr
@@ -35,7 +34,7 @@ def remove_redundant(arr):
             output array without redundant columns
     """
     nonredundant_cols = []
-    for i in range(arr.shape[1]-1):
+    for i in range(arr.shape[1]):
         unique_elements = np.unique(arr[:, i])
         if len(unique_elements) > 1:
             nonredundant_cols.append(i)
@@ -55,11 +54,11 @@ def sequence_to_integers(sequence):
         np.array: Array where bases (str) are replaced by integers
 
     """
-    sequence_ = np.copy(sequence)
-    sequence_[sequence_ == 'A'] = 1
-    sequence_[sequence_ == 'T'] = 2
-    sequence_[sequence_ == 'G'] = 3
-    sequence_[sequence_ == 'C'] = 4
+    sequence_ = np.empty(sequence.shape, dtype=int)
+    sequence_[sequence == 'A'] = 1
+    sequence_[sequence == 'U'] = 2
+    sequence_[sequence == 'G'] = 3
+    sequence_[sequence == 'C'] = 4
 
     return sequence_
 
