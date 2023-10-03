@@ -8,8 +8,9 @@ input = snakemake.input[0]
 output_genotypes = snakemake.output.genotypes
 output_genotypes_num = snakemake.output.genotypes_num
 output_phenotypes = snakemake.output.phenotypes
+csv_delimiter = snakemake.params.csv_delimiter
 
-seq_arr, phe_arr = read_fl_data(input)
+seq_arr, phe_arr = read_fl_data(input, delim=csv_delimiter)
 seq_arr_num = sequence_to_integers(seq_arr)  # encode bases as integers
 
 np.save(output_genotypes, seq_arr)

@@ -1,0 +1,51 @@
+# General Snakefile for simulating kimura adaptive walks
+
+configfile: "./config.yaml"
+scripts = config["scripts"]
+csv_input = config["csv_input"]
+
+
+rule all:
+    input:
+        "transition_matrix_uniform.npz"
+
+rule csv_to_array:
+    input:
+        csv_input
+    output:
+        genotypes="genotypes.npy",
+        genotypes_num="genotypes.num.npy",
+        phenotypes="phenotypes.npy"
+    params:
+        csv_delimiter=config["csv_delimiter"]
+    script:
+        scripts + "csv_to_array.py"
+
+rule compute_hamming_distances:
+    input:
+        "genotypes.num.npy"
+    output:
+        "hamming_distances.npy"
+    script:
+        scripts + "compute_hamming_distances.py"    
+
+rule build_transition_matrix:
+    input: 
+        hamming_dist="hamming_distances.npy",
+        phenotypes="phenotypes.npy"
+    output:
+        "transition_matrix_uniform.npz"
+    script:
+        scripts + "build_transition_matrix_uniform.py"
+
+rule run_adaptive_walks:
+    input:
+        "transition_matrix_uniform.npz"
+    output:
+        "adaptive_walks_uniform.pickle"
+    params:
+        starting_set_size=config["adaptive_walk_params"]["starting_set_size"],
+        sample_size=config["adaptive_walk_params"]["sample_size"],
+        rseed=config["random_seed"]
+    script:
+        scripts + "run_adaptive_walks.py"

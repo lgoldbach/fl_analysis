@@ -29,6 +29,8 @@ fix_probs = np.concatenate((fix_prob1, fix_prob2))
 edges0 = np.concatenate((edges[0], edges[1]))
 edges1 = np.concatenate((edges[1], edges[0]))
 
-T = csr_matrix((fix_probs, (edges0, edges1)), shape=(17851, 17851))
+dim = ph.shape[0]
+T = csr_matrix((fix_probs, (edges0, edges1)), shape=(dim, dim))
+T = normalize(T, norm="l1")
 
 save_npz(snakemake.output[0], T)
