@@ -1,8 +1,0 @@
-scripts: "/home/lgold/phd/research/projects/landscape_analysis/fl_analysis/scripts/"
-csv_input: "TetR_landscape.csv"
-
-random_seed: 312123
-
-adaptive_walk_params:
-  starting_set_size: 1000
-  sample_size: 1000

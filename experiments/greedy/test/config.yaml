@@ -1,9 +1,0 @@
-scripts: "/home/lgold/phd/research/projects/landscape_analysis/fl_analysis/scripts/"
-csv_input: "test_landscape.csv"
-csv_delimiter: ","
-
-random_seed: 312123
-
-adaptive_walk_params:
-  starting_set_size: 1000
-  sample_size: 1000

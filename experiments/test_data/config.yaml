@@ -1,9 +1,0 @@
-scripts: "/home/lgold/phd/research/projects/landscape_analysis/fl_analysis/scripts/"
-csv_input: "test_landscape.csv"
-
-walk_type:
-  - uniform
-
-pop_size_exp:
-  - 5
-  - 8
