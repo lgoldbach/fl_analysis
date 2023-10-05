@@ -2,6 +2,32 @@ import numpy as np
 import pandas as pd
 
 
+# E. coli wild type transition & transversion biases according to Lee et al.
+# PNAS, 109 (41), 2012 https://doi.org/10.1073/pnas.1210309109
+mutation_biases = {('A', 'G'): .21,
+                   ('T', 'C'): .21,
+                   ('G', 'A'): .35,
+                   ('C', 'T'): .35,
+                   ('A', 'T'): .07,
+                   ('T', 'A'): .07,
+                   ('A', 'C'): .16,
+                   ('T', 'G'): .16,
+                   ('G', 'T'): .13,
+                   ('C', 'A'): .13,
+                   ('G', 'C'): .07,
+                   ('C', 'G'): .07}
+
+
+def add_mutation_bias(T, genotypes):
+    for i, j in zip(*T.nonzero()):  # loop over sparse csr matrix
+        g1, g2 = genotypes[i], genotypes[j]  # get genotypes
+        mask = g1 != g2  # compare genotypes (find position where they differ)
+        n1, n2 = g1[mask][0], g2[mask][0]  # get nucleotides
+        T[(i, j)] *= mutation_biases[(n1, n2)]  # multiply fix. prob by mutation bias.
+
+    return T
+
+
 def get_column_from_csv(path: str, delim: str, col_id: str):
     """Read the data from the fitness landscape data file
 
