@@ -2,7 +2,25 @@ import numpy as np
 import pandas as pd
 
 
-def read_fl_data(path: str, delim: str):
+def get_column_from_csv(path: str, delim: str, col_id: str):
+    """Read the data from the fitness landscape data file
+
+    Args:
+        path (str): Path to the fitness landscape data file
+        delim (str): csv delimiter, e.g. "," or "\t"
+        col_id (str): columns identifier
+        
+    Returns:
+        np.array: column values as numpy array
+
+    """
+    fl_df = pd.read_csv(path, delimiter=delim)
+    # turn into N x L array (N = #sequences, L = sequence length)
+    arr = fl_df[col_id].to_numpy()
+    return arr
+
+
+def read_fl_data(path: str, delim: str, phe_column_id: str):
     """Read the data from the fitness landscape data file
 
     Args:
@@ -17,7 +35,7 @@ def read_fl_data(path: str, delim: str):
     seq_arr = np.array([list(seq) for seq in fl_df["seq"]])
     # remove columns that contain the same base, i.e. redundant sites of seq.
     seq_arr = remove_redundant(seq_arr)
-    phe_arr = fl_df["score"].to_numpy(dtype=float)
+    phe_arr = fl_df[phe_column_id].to_numpy(dtype=float)
 
     return seq_arr, phe_arr
 

@@ -23,12 +23,11 @@ score_diffs = np.concatenate((ph_diff1, ph_diff2))
 
 edges0 = np.concatenate((edges[1], edges[0]))  # get both directions for each edge
 edges1 = np.concatenate((edges[0], edges[1]))
-
+# print(score_diffs)
 dim = ph.shape[0]
 T = csr_matrix((score_diffs, (edges0, edges1)), shape=(dim, dim))
 T.eliminate_zeros()
 T[T.nonzero()] = 1
 T = normalize(T, norm="l1")
-print(T)
 
 save_npz(snakemake.output[0], T)
