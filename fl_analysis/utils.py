@@ -19,6 +19,18 @@ mutation_biases = {('A', 'G'): .21,
 
 
 def add_mutation_bias(T, genotypes):
+    """Corrects fixation probabilities for e. coli wild type mutation bias.
+
+    Args:
+        T (scipy.sparse.csr_matrix): Sparse matrix holding fixation probabilies
+        genotypes (numpy.array): numpy array of genotypes. The indices of T
+                        correspond to the genotypes, e.g. T[i, j] holds the
+                        fixation probability of genotype[i] to genotype[j].
+
+    Returns:
+        T: scipy.sparse.csr_matrix (edits input T in-place)
+    
+    """
     for i, j in zip(*T.nonzero()):  # loop over sparse csr matrix
         g1, g2 = genotypes[i], genotypes[j]  # get genotypes
         mask = g1 != g2  # compare genotypes (find position where they differ)
@@ -26,6 +38,36 @@ def add_mutation_bias(T, genotypes):
         T[(i, j)] *= mutation_biases[(n1, n2)]  # multiply fix. prob by mutation bias.
 
     return T
+
+
+def n_highest_phenotypes(phenotypes, n):
+    """Get the indices of the n highest phenotypes.
+
+    Args:
+        phenotypes (1D numpy.array): phenotype array (dtype float or int)
+        n (int): Return the indices of the n highest phenotypes
+    
+    Returns:
+        list: The indices of the n highest phenotypes (not sorted)
+    
+    """
+    ind = np.argpartition(phenotypes, -n)[-n:]
+    return ind
+
+
+def n_lowest_phenotypes(phenotypes, n):
+    """Get the indices of the n lowest phenotypes.
+
+    Args:
+        phenotypes (1D numpy.array): phenotype array (dtype float or int)
+        n (int): Return the indices of the n lowest phenotypes
+    
+    Returns:
+        list: The indices of the n lowest phenotypes (not sorted)
+    
+    """
+    ind = np.argpartition(phenotypes, n)[:n]
+    return ind
 
 
 def get_column_from_csv(path: str, delim: str, col_id: str):
