@@ -2,7 +2,51 @@ import numpy as np
 import pandas as pd
 
 
-def read_fl_data(path: str, delim: str):
+# E. coli wild type transition & transversion biases according to Lee et al.
+# PNAS, 109 (41), 2012 https://doi.org/10.1073/pnas.1210309109
+mutation_biases = {('A', 'G'): .21,
+                   ('T', 'C'): .21,
+                   ('G', 'A'): .35,
+                   ('C', 'T'): .35,
+                   ('A', 'T'): .07,
+                   ('T', 'A'): .07,
+                   ('A', 'C'): .16,
+                   ('T', 'G'): .16,
+                   ('G', 'T'): .13,
+                   ('C', 'A'): .13,
+                   ('G', 'C'): .07,
+                   ('C', 'G'): .07}
+
+
+def add_mutation_bias(T, genotypes):
+    for i, j in zip(*T.nonzero()):  # loop over sparse csr matrix
+        g1, g2 = genotypes[i], genotypes[j]  # get genotypes
+        mask = g1 != g2  # compare genotypes (find position where they differ)
+        n1, n2 = g1[mask][0], g2[mask][0]  # get nucleotides
+        T[(i, j)] *= mutation_biases[(n1, n2)]  # multiply fix. prob by mutation bias.
+
+    return T
+
+
+def get_column_from_csv(path: str, delim: str, col_id: str):
+    """Read the data from the fitness landscape data file
+
+    Args:
+        path (str): Path to the fitness landscape data file
+        delim (str): csv delimiter, e.g. "," or "\t"
+        col_id (str): columns identifier
+        
+    Returns:
+        np.array: column values as numpy array
+
+    """
+    fl_df = pd.read_csv(path, delimiter=delim)
+    # turn into N x L array (N = #sequences, L = sequence length)
+    arr = fl_df[col_id].to_numpy()
+    return arr
+
+
+def read_fl_data(path: str, delim: str, phe_column_id: str):
     """Read the data from the fitness landscape data file
 
     Args:
@@ -17,7 +61,7 @@ def read_fl_data(path: str, delim: str):
     seq_arr = np.array([list(seq) for seq in fl_df["seq"]])
     # remove columns that contain the same base, i.e. redundant sites of seq.
     seq_arr = remove_redundant(seq_arr)
-    phe_arr = fl_df["score"].to_numpy(dtype=float)
+    phe_arr = fl_df[phe_column_id].to_numpy(dtype=float)
 
     return seq_arr, phe_arr
 

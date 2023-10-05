@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import numpy as np
 from scipy.sparse import csr_matrix, save_npz
-from sklearn.preprocessing import normalize
 
 
 # Snakemake input output definitions
