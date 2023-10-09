@@ -54,7 +54,6 @@ def n_highest_phenotypes(phenotypes, n):
     ind = np.argpartition(phenotypes, -n)[-n:]
     return ind
 
-
 def n_lowest_phenotypes(phenotypes, n):
     """Get the indices of the n lowest phenotypes.
 
@@ -142,7 +141,7 @@ def sequence_to_integers(sequence):
     """
     sequence_ = np.empty(sequence.shape, dtype=int)
     sequence_[sequence == 'A'] = 1
-    sequence_[sequence == 'U'] = 2
+    sequence_[sequence == 'T'] = 2
     sequence_[sequence == 'G'] = 3
     sequence_[sequence == 'C'] = 4
 

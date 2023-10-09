@@ -1,8 +1,9 @@
 seq,score,type
-GAA,0.3,np
+AAA,0.3,np
 AAT,0.3,np
-ATC,0.4,np 
+ATA,0.4,np 
 TAA,0.45,np
-GTA,0.5,np
-TTC,0.6,np
+TTA,0.5,np
+TAT,0.6,np
+ATT,0.65,np
 TTT,0.7,p

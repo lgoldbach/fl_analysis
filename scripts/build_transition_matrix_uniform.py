@@ -5,7 +5,6 @@ from sklearn.preprocessing import normalize
 
 from fl_analysis.utils import add_mutation_bias
 
-
 # Snakemake input output definitions
 input_genotypes = snakemake.input.genotypes
 input_phenotypes = snakemake.input.phenotypes

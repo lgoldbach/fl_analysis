@@ -7,9 +7,7 @@ csv_input = config["csv_input"]
 
 rule all:
     input:
-        expand("transition_matrix_10-{pop_size_exp}.npz", 
-               pop_size_exp=config["pop_size_exp"])
-
+        "adaptive_walks.pickle"
 
 rule parse_genotypes:
     input:
@@ -49,8 +47,29 @@ rule build_transition_matrix:
         phenotypes="phenotypes.npy",
         genotypes="genotypes.npy"
     output:
-        "transition_matrix_10-{pop_size_exp}.npz"
-    params:
-        pop_size_exp="{pop_size_exp}"
+        "transition_matrix.npz"
     script:
         scripts + "build_transition_matrix_uniform.py"
+
+rule pick_starting_genotypes:
+    input:
+        phenotypes="phenotypes.npy",
+    output:
+        "starting_genotypes.npy"
+    params:
+        starting_set_size=config["adaptive_walk_params"]["starting_set_size"],
+        rseed=config["random_seed"]
+    script:
+        scripts + "pick_genotypes.py"
+
+rule run_adaptive_walks:
+    input:
+        transition_matrix="transition_matrix.npz",
+        starting_genotypes="starting_genotypes.npy"
+    output:
+        "adaptive_walks.pickle"
+    params:
+        sample_size=config["adaptive_walk_params"]["sample_size"],
+        rseed=config["random_seed"]
+    script:
+        scripts + "run_adaptive_walks.py"
