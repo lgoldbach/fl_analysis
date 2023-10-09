@@ -2,7 +2,6 @@ import numpy as np
 
 
 def adaptive_walk(T, local_peaks=None, max_steps=5, conv_crit=10**-5, sample_size=10, starting_set=None):
-    n = T.shape[0]
     paths = {}
     counts = []
     

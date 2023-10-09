@@ -148,18 +148,16 @@ def sequence_to_integers(sequence):
     return sequence_
 
 
-def kimura_fixation(p1: float, p2: float, N: int):
+def kimura_fixation(s: float, N: int):
     """Formula to compute kimuara's fixation probability
 
     Args:
-        p1 (float): Phenotype 1
-        p2 (float): Phenotype 2
+        s (float): Selectio coefficient
         N (int): Population size
 
     Returns:
         float: fixation probability (float in [0, 1]).
     
     """
-    s = p2 - p1
     return (1-np.exp(-2*s))/(1-np.exp(-2*N*s))
 

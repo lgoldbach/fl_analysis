@@ -27,7 +27,6 @@ row_sums = np.array(T.sum(axis=1))[:,0]
 # e.g low population sizes)
 ma = np.ma.masked_equal(row_sums, 0)
 local_peaks = np.ma.getmaskarray(ma)
-
 data = adaptive_walk(T=T, local_peaks=local_peaks, sample_size=sample_size, max_steps=1000, starting_set=starting_set)
 
 pickle.dump(data, open(output, "wb"))

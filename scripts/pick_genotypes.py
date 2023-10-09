@@ -15,7 +15,7 @@ np.random.seed(seed)
 ph = np.load(phenotype_path)
 
 # Pick the n highest phenotypes
-ph_high = n_highest_phenotypes(ph, n=starting_set_size)  
+ph_ids = n_highest_phenotypes(ph, n=starting_set_size)  
 
 # ## this code is for picking random nodes that are not local peaks
 # row_sums = np.array(T.sum(axis=1))[:,0]
@@ -27,4 +27,4 @@ ph_high = n_highest_phenotypes(ph, n=starting_set_size)
 # starting_set = np.random.choice(non_peaks, size=starting_set_size, replace=False)  # pick 10000 random non-peak genotypes
 
 
-np.save(output, ph_high)
+np.save(output, ph_ids)
