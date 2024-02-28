@@ -1,0 +1,113 @@
+# General Snakefile for simulating adaptive walks
+
+import itertools
+
+configfile: "./config.yaml"
+scripts = config["scripts"]
+csv_pheno_id = config["csv_pheno_id"]
+csv_input_suffix = config["csv_input_suffix"]
+
+
+paths = []
+for walks in config["non_param_walks"]:  # paths with depth=1
+    paths.append(walks + "/")
+for walks in config["param_walks"]:  # paths with depth=2
+    for param in config["param_walks_params"]:
+        paths.append(walks + "/10-" + str(param) + "/")
+
+rule all:
+    input:
+        # create the required directories as constructed in the loop above
+        expand("{tf}/{path}.mkdir_placeholder",
+               tf=config["TFs"], path=paths),
+        # set target for walk that do not use additional parameters and thus don't need subdirectories
+        expand("{tf}/{non_param_walk}/adaptive_walks.csv", 
+               tf=config["TFs"], non_param_walk=config["non_param_walks"]),
+        # set the target for walks that use parameters (i.e. have one layer of subdirectories)
+        expand("{tf}/{param_walk}/10-{param}/adaptive_walks.csv", 
+            tf=config["TFs"], param_walk=config["param_walks"], param=config["param_walks_params"])
+
+rule create_subdirectories:
+    priority: 1
+    output:
+        "{full_path}.mkdir_placeholder"  # temp -> this file will be deleted when all jobs are done
+    shell:
+        "mkdir -p {wildcards.full_path} && "  # create directory
+        "touch {output}"  # make file (only to satisfy condition)
+
+rule split_csv_into_gt_and_ph_arrays:
+    input:
+        "{tf}" + csv_input_suffix
+    output:
+        genotypes="{tf}/genotypes.npy",
+        genotypes_num="{tf}/genotypes.num.npy",
+        phenotypes="{tf}/phenotypes.npy"
+    params:
+        csv_delimiter=config["csv_delimiter"],
+        csv_pheno_id=csv_pheno_id
+    script:
+        scripts + "csv_to_array.py"
+
+rule compute_hamming_distances:
+    input:
+        "{tf}/genotypes.num.npy"
+    output:
+        "{tf, ([a-z]|[A-Z])+}/hamming_distances.npy"
+    script:
+        scripts + "compute_hamming_distances.py"    
+
+rule build_transition_matrix_kimura:
+    input: 
+        hamming_dist="{tf}/hamming_distances.npy",
+        phenotypes="{tf}/phenotypes.npy",
+        genotypes="{tf}/genotypes.npy"
+    output:
+        "{tf}/{walk_type}/10-{pop_size_exp}/transition_matrix.npz",
+    params:
+        pop_size_exp="{pop_size_exp}"
+    script:
+        scripts + "build_transition_matrix_{wildcards.walk_type}.py"
+
+rule build_transition_matrix_simple:
+    input: 
+        hamming_dist="{tf}/hamming_distances.npy",
+        phenotypes="{tf}/phenotypes.npy",
+        genotypes="{tf}/genotypes.npy"
+    output:
+        "{tf}/{walk_type, [a-z]+}/transition_matrix.npz",
+    script:
+        scripts + "build_transition_matrix_{wildcards.walk_type}.py"
+
+rule pick_starting_genotypes:
+    input:
+        phenotypes="{tf}/phenotypes.npy",
+    output:
+        "{tf, ([a-z]|[A-Z])+}/starting_genotypes.npy"
+    params:
+        starting_set_size=config["adaptive_walk_params"]["starting_set_size"],
+        rseed=config["random_seed"],
+        criterion=config["adaptive_walk_params"]["start_from"]
+    script:
+        scripts + "pick_genotypes.py"
+
+rule run_adaptive_walks:
+    input:
+        transition_matrix="{tf}/{walk_type}/transition_matrix.npz",
+        starting_genotypes="{tf}/starting_genotypes.npy"
+    output:
+        "{tf, ([a-z]|[A-Z])+}/{walk_type}/adaptive_walks.pickle"
+    params:
+        sample_size=config["adaptive_walk_params"]["sample_size"],
+        rseed=config["random_seed"],
+        max_steps=config["adaptive_walk_params"]["max_steps"]
+    script:
+        scripts + "run_adaptive_walks.py"
+
+rule path_pickle_to_csv:
+    input:
+        genotypes="{tf}/genotypes.npy",
+        paths="{tf}/{walk_type}/adaptive_walks.pickle"
+    output:
+        "{tf, ([a-z]|[A-Z])+}/{walk_type}/adaptive_walks.csv"
+    script:
+        scripts + "path_pickle_to_csv.py"

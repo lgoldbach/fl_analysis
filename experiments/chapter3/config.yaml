@@ -1,0 +1,31 @@
+scripts: "/home/lgold/phd/research/projects/landscape_analysis/fl_analysis/scripts/"
+csv_input_suffix: _Landscape.csv  # Snakefile expects filenames {TF}{csv_input_suffix}
+
+TFs:
+  - Fis
+  - CRP
+  - IHF
+
+csv_delimiter: ","
+
+csv_pheno_id: score  # Header of the column containing the phenotypes
+
+non_param_walks:
+  - greedy
+  - uniform
+
+param_walks:
+  - kimura
+
+param_walks_params:
+  # - 2
+  - 5
+  - 8
+
+random_seed: 312123
+
+adaptive_walk_params:
+  starting_set_size: 10
+  start_from: random
+  sample_size: 10
+  max_steps: 25

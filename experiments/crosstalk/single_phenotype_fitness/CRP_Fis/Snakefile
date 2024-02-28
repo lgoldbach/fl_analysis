@@ -1,0 +1,107 @@
+# General Snakefile for simulating adaptive walks
+
+import itertools
+
+configfile: "./config.yaml"
+scripts = config["scripts"]
+csv_input = config["csv_input"]
+csv_pheno_id_prefix = config["csv_phenotype_prefix"]
+
+# get all the filenames for the possible permutations of the two TFs
+filenames = [f"adaptive_walks_{ph_pair[0]}_to_{ph_pair[1]}.csv" 
+                for ph_pair in itertools.permutations(config["phenotypes"])]
+
+paths = []
+for walks in config["non_param_walks"]:  # paths with depth=1
+    paths.append(walks + "/")
+for walks in config["param_walks"]:  # paths with depth=2
+    for param in config["pop_size_exp"]:
+        paths.append(walks + "/10-" + str(param) + "/")
+
+rule all:
+    input:
+        expand("{paths}{filenames}", filenames=filenames, paths=paths)
+
+rule parse_genotypes:
+    input:
+        csv_input
+    output:
+        genotypes="genotypes.npy",
+        genotypes_num="genotypes.num.npy"
+    params:
+        csv_delimiter=config["csv_delimiter"]
+    script:
+        scripts + "extract_genotypes.py"
+
+rule parse_phenotypes:
+    input:
+        csv_input
+    output:
+        phenotype="phenotypes_{ph}.npy"
+    params:
+        csv_delimiter=config["csv_delimiter"],
+        csv_pheno_id=csv_pheno_id_prefix+"{ph}"
+    script:
+        scripts + "extract_phenotypes.py"
+
+rule compute_hamming_distances:
+    input:
+        "genotypes.num.npy"
+    output:
+        "hamming_distances.npy"
+    script:
+        scripts + "compute_hamming_distances.py"    
+
+rule build_transition_matrix_kimura:
+    input: 
+        hamming_dist="hamming_distances.npy",
+        phenotypes="phenotypes_{ph2}.npy",
+        genotypes="genotypes.npy"
+    output:
+        "{walk_type}/10-{pop_size_exp}/transition_matrix_{ph1}_to_{ph2}.npz",
+    params:
+        pop_size_exp="{pop_size_exp}"
+    script:
+        scripts + "build_transition_matrix_{wildcards.walk_type}.py"
+
+rule build_transition_matrix_simple:
+    input: 
+        hamming_dist="hamming_distances.npy",
+        phenotypes="phenotypes_{ph2}.npy",
+        genotypes="genotypes.npy"
+    output:
+        "{walk_type, [a-z]+}/transition_matrix_{ph1}_to_{ph2}.npz",
+    script:
+        scripts + "build_transition_matrix_{wildcards.walk_type}.py"
+
+rule pick_starting_genotypes:
+    input:
+        phenotypes="phenotypes_{ph1}.npy",
+    output:
+        "starting_genotypes_{ph1}.npy"
+    params:
+        starting_set_size=config["adaptive_walk_params"]["starting_set_size"],
+        rseed=config["random_seed"]
+    script:
+        scripts + "pick_genotypes.py"
+
+rule run_adaptive_walks:
+    input:
+        transition_matrix="{paths}transition_matrix_{ph1}_to_{ph2}.npz",
+        starting_genotypes="starting_genotypes_{ph1}.npy"
+    output:
+        "{paths}adaptive_walks_{ph1}_to_{ph2}.pickle"
+    params:
+        sample_size=config["adaptive_walk_params"]["sample_size"],
+        rseed=config["random_seed"]
+    script:
+        scripts + "run_adaptive_walks.py"
+
+rule path_pickle_to_csv:
+    input:
+        genotypes="genotypes.npy",
+        paths="{paths}adaptive_walks_{ph1}_to_{ph2}.pickle"
+    output:
+        "{paths}adaptive_walks_{ph1}_to_{ph2}.csv"
+    script:
+        scripts + "path_pickle_to_csv.py"
