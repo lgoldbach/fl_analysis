@@ -10,3 +10,4 @@ experiments/*
 
 !Snakefile
 !config.yaml
+test_pipeline

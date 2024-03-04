@@ -18,14 +18,14 @@ param_walks:
   - kimura
 
 param_walks_params:
-  # - 2
+  - 2
   - 5
   - 8
 
 random_seed: 312123
 
 adaptive_walk_params:
-  starting_set_size: 10
+  starting_set_size: 15000
   start_from: random
-  sample_size: 10
+  sample_size: 1000
   max_steps: 25
